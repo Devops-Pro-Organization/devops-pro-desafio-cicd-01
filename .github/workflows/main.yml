@@ -24,7 +24,7 @@ jobs:
 
   testes:
     needs: [build]
-    uses: https://github.com/Devops-Pro-Organization/devops-pro-desafio-cicd-01@main
+    uses: Devops-Pro-Organization/devops-pro-desafio-cicd-01/.github/workflows/testes.yml@main
 
   release:
     name: Criação de Release
