@@ -50,14 +50,14 @@ jobs:
     name: Scan com o SonarQube
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4 
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "21"
-
-      - name: Obtendo o código do projeto
-        uses: actions/checkout@v4 
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -70,12 +70,15 @@ jobs:
           echo 'export PATH="$HOME/.dotnet/tools:$PATH"' >> $HOME/.bashrc
           source $HOME/.bashrc
 
+      - name: Verificar estrutura do repositório
+        run: ls -R
+
       - name: Restaurar dependências
-        run: dotnet restore
+        run: dotnet restore **/*.sln  # Especificando o arquivo de solução
 
       - name: Executar testes e gerar cobertura
         run: |
-          dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=coverage/reports/SonarQube.xml
+          dotnet test **/*.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=coverage/reports/SonarQube.xml
 
       - name: Executar Análise no SonarQube
         env:
@@ -83,8 +86,9 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
           dotnet sonarscanner begin /k:"devops-pro-desafio-cicd-01" /o:"Devops-Pro-Organization" /d:sonar.host.url="$SONAR_HOST_URL" /d:sonar.login="$SONAR_TOKEN" /d:sonar.cs.opencover.reportsPaths=coverage/reports/SonarQube.xml
-          dotnet build
+          dotnet build **/*.sln
           dotnet sonarscanner end /d:sonar.login="$SONAR_TOKEN"
+
 
 
       
