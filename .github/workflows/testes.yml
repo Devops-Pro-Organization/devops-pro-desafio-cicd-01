@@ -39,9 +39,35 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.300"
-          
+
       - name: Execução do Teste de Integração
         working-directory: ./src
         run: dotnet test Review-Filmes.Test.Integration/Review-Filmes.Test.Integration.csproj
         env:
           ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=review-filmes;Username=review;Password=postgrespwd"
+
+  sonarqube:
+    name: Scan com o Sonarqube
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+      - name: Obtendo o código do projeto
+        uses: actions/checkout@v4
+        
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.300"
+      - name: Execução do Sonarqube
+        run: dotnet sonarscanner begin /k:"review-filmes" /d:sonar.login="${{ secrets.SONARQUBE_TOKEN }}" /d:sonar.host.url="http://localhost:9000" /d:sonar.cs.opencover.reportsPaths="./src/Review-Filmes.Test.Unit/coverage.opencover.xml" /d:sonar.coverage.exclusions="**/bin/**/*,**/obj/**/*" /d:sonar.exclusions="**/bin/**/*,**/obj/**/*" /d:sonar.cs.vstest.reportsPaths="./src/Review-Filmes.Test.Unit/TestResults/*.trx"
+      - name: Execução do Teste de Unidade
+        working-directory: ./src
+        run: dotnet test Review-Filmes.Test.Unit/Review-Filmes.Test.Unit.csproj
+      - name: Execução do Teste de Integração
+        working-directory: ./src
+        run: dotnet test Review-Filmes.Test.Integration/Review-Filmes.Test.Integration.csproj
+      - name: Finalizando o Scan
+        run: dotnet sonarscanner end /d:sonar.login="${{ secrets.SONARQUBE_TOKEN }}"
