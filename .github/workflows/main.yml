@@ -25,6 +25,7 @@ jobs:
   testes:
     needs: [build]
     uses: Devops-Pro-Organization/devops-pro-desafio-cicd-01/.github/workflows/testes.yml@main
+    secrets: inherit
 
   release:
     name: Criação de Release
