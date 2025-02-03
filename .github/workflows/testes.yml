@@ -64,20 +64,11 @@ jobs:
         with:
           dotnet-version: "8.0.300"
 
-      - name: Restaurar Dependências
-        run: dotnet restore
-  
-      - name: Compilar o Projeto
-        run: dotnet build --no-restore
-  
-      - name: Executar Testes com Cobertura
-        run: dotnet test --no-build --collect:"XPlat Code Coverage" --results-directory coverage
-  
-      - name: Converter Cobertura para Formato SonarQube
+      - name: Instalando o SonarScanner
         run: |
-          dotnet tool install --global dotnet-reportgenerator-globaltool
-          reportgenerator -reports:coverage/**/coverage.cobertura.xml -targetdir:coverage/reports -reporttypes:SonarQube
-  
+          dotnet tool install --global dotnet-sonarscanner
+          export PATH="$PATH:$HOME/.dotnet/tools"
+           
       - name: Executar Análise no SonarQube
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
