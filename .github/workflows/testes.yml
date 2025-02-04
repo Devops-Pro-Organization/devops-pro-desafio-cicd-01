@@ -70,6 +70,10 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=Devops-Pro-Organization_devops-pro-desafio-cicd-01
+            -Dsonar.organization=devops-pro-organization
   
       # Aguarda a análise ser processada antes de verificar o Quality Gate
       - name: SonarQube Quality Gate check
