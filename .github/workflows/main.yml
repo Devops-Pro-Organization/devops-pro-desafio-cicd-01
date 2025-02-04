@@ -48,7 +48,7 @@ jobs:
           tags: |
             diogofiaminghi/projeto-devops-pro-filmes:latest
             diogofiaminghi/projeto-devops-pro-filmes:v${{ github.run_number }}
-#1
+#12
             
       
       
