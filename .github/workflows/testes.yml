@@ -16,9 +16,9 @@ jobs:
         with:
           dotnet-version: "8.0.300"
 
-    #   - name: Restauração de pacotes NuGet
-    #     working-directory: ./src
-    #     run: dotnet restore
+      - name: Restauração de pacotes NuGet
+        working-directory: ./src
+        run: dotnet restore
 
       - name: Compilação do código
         working-directory: ./src
@@ -69,32 +69,14 @@ jobs:
         env:
           ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=review-filmes;Username=review;Password=postgrespwd"
 
-  sonarqube:
-    name: Scan com o SonarQube
+  sonarqube-quality-gate:
+    name: SonarQube Quality Gate Check
     runs-on: ubuntu-latest
-    needs: build
     steps:
       - name: Checkout do código
-        uses: actions/checkout@v4 
+        uses: actions/checkout@v4
 
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: "temurin"
-          java-version: "21"
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "8.0.300"
-
-      - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-
-      - name: SonarQube Quality Gate check
+      - name: Verificar Status do SonarQube Quality Gate
         id: sonarqube-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@master
         with:
@@ -103,5 +85,10 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-      - name: "Exibir status do Quality Gate"
-        run: echo "O status do Quality Gate é ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+      - name: Validar Status do Quality Gate
+        run: |
+          if [[ "${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}" != "PASSED" ]]; then
+            echo "Quality Gate falhou! Status: ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+            exit 1
+          fi
+        shell: bash
