@@ -64,30 +64,55 @@ jobs:
         with:
           dotnet-version: "8.0.300"
 
-      - name: Instalando o SonarScanner
-        run: |
-          dotnet tool install --global dotnet-sonarscanner
-          echo 'export PATH="$HOME/.dotnet/tools:$PATH"' >> $HOME/.bashrc
-          source $HOME/.bashrc
-
-      - name: Verificar estrutura do repositório
-        run: ls -R
-
-      - name: Restaurar dependências
-        run: dotnet restore **/*.sln  # Especificando o arquivo de solução
-
-      - name: Executar testes e gerar cobertura
-        run: |
-          dotnet test **/*.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=coverage/reports/SonarQube.xml
-
-      - name: Executar Análise no SonarQube
+      # Triggering SonarQube analysis as results of it are required by Quality Gate check.
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: |
-          dotnet sonarscanner begin /k:"devops-pro-desafio-cicd-01" /o:"Devops-Pro-Organization" /d:sonar.host.url="$SONAR_HOST_URL" /d:sonar.login="$SONAR_TOKEN" /d:sonar.cs.opencover.reportsPaths=coverage/reports/SonarQube.xml
-          dotnet build **/*.sln
-          dotnet sonarscanner end /d:sonar.login="$SONAR_TOKEN"
+
+      # Check the Quality Gate status.
+      - name: SonarQube Quality Gate check
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        with:
+          pollingTimeoutSec: 600
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} #OPTIONAL
+
+      # Optionally you can use the output from the Quality Gate in another step.
+      # The possible outputs of the `quality-gate-status` variable are `PASSED`, `WARN` or `FAILED`.
+      - name: "Example show SonarQube Quality Gate Status value"
+        run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+
+
+
+
+      # - name: Instalando o SonarScanner
+      #   run: |
+      #     dotnet tool install --global dotnet-sonarscanner
+      #     echo 'export PATH="$HOME/.dotnet/tools:$PATH"' >> $HOME/.bashrc
+      #     source $HOME/.bashrc
+
+      # - name: Verificar estrutura do repositório
+      #   run: ls -R
+
+      # - name: Restaurar dependências
+      #   run: dotnet restore **/*.sln  # Especificando o arquivo de solução
+
+      # - name: Executar testes e gerar cobertura
+      #   run: |
+      #     dotnet test **/*.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=coverage/reports/SonarQube.xml
+
+      # - name: Executar Análise no SonarQube
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      #   run: |
+      #     dotnet sonarscanner begin /k:"devops-pro-desafio-cicd-01" /o:"Devops-Pro-Organization" /d:sonar.host.url="$SONAR_HOST_URL" /d:sonar.login="$SONAR_TOKEN" /d:sonar.cs.opencover.reportsPaths=coverage/reports/SonarQube.xml
+      #     dotnet build **/*.sln
+      #     dotnet sonarscanner end /d:sonar.login="$SONAR_TOKEN"
 
 
 
