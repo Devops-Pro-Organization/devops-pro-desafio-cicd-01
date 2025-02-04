@@ -4,30 +4,30 @@ on:
   workflow_call:
 
 jobs:
-#   build:
-#     name: Compilação do Projeto
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Obtendo o código do projeto
-#         uses: actions/checkout@v4
+  build:
+    name: Compilação do Projeto
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtendo o código do projeto
+        uses: actions/checkout@v4
 
-#       - name: Setup .NET
-#         uses: actions/setup-dotnet@v4
-#         with:
-#           dotnet-version: "8.0.300"
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.300"
 
-#       - name: Restauração de pacotes NuGet
-#         working-directory: ./src
-#         run: dotnet restore
+      - name: Restauração de pacotes NuGet
+        working-directory: ./src
+        run: dotnet restore
 
-#       - name: Compilação do código
-#         working-directory: ./src
-#         run: dotnet build --configuration Release --no-restore
+      - name: Compilação do código
+        working-directory: ./src
+        run: dotnet build --configuration Release --no-restore
 
   unit-test:
     name: Teste de Unidade
     runs-on: ubuntu-latest
-    # needs: build
+    needs: build
     steps:
       - name: Obtendo o código do projeto
         uses: actions/checkout@v4
@@ -44,7 +44,7 @@ jobs:
   integration-test:
     name: Teste de Integração
     runs-on: ubuntu-latest
-    # needs: build
+    needs: build
     services:
       postgres:
         image: postgres:latest
@@ -72,7 +72,7 @@ jobs:
   sonarqube:
     name: Scan with SonarQube and SonarQube Quality Gate Check
     runs-on: ubuntu-latest
-    # needs: build
+    needs: build
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4 
