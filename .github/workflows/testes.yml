@@ -69,15 +69,34 @@ jobs:
         env:
           ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=review-filmes;Username=review;Password=postgrespwd"
 
-  sonarqube-quality-gate:
-    name: SonarQube Quality Gate Check
+  sonarqube:
+    name: Scan with SonarQube and SonarQube Quality Gate Check
     runs-on: ubuntu-latest
     # needs: build
     steps:
       - name: Checkout do código
-        uses: actions/checkout@v4
-
-      - name: Verificar Status do SonarQube Quality Gate
+        uses: actions/checkout@v4 
+  
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+  
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.300"
+  
+      # Executa o scanner do SonarQube
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  
+      # Aguarda a análise ser processada antes de verificar o Quality Gate
+      - name: SonarQube Quality Gate check
         id: sonarqube-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@master
         with:
@@ -85,11 +104,11 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-
-      - name: Validar Status do Quality Gate
+  
+      # Falha a pipeline se o Quality Gate não for aprovado
+      - name: Validar Quality Gate
         run: |
           if [[ "${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}" != "PASSED" ]]; then
-            echo "Quality Gate falhou! Status: ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+            echo "Erro: Quality Gate do SonarQube não aprovado!"
             exit 1
           fi
-        shell: bash
