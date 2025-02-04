@@ -16,9 +16,9 @@ jobs:
         with:
           dotnet-version: "8.0.300"
 
-      - name: Restauração de pacotes NuGet
-        working-directory: ./src
-        run: dotnet restore
+    #   - name: Restauração de pacotes NuGet
+    #     working-directory: ./src
+    #     run: dotnet restore
 
       - name: Compilação do código
         working-directory: ./src
