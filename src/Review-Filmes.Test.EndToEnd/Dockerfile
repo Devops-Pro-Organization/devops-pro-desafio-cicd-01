@@ -8,7 +8,7 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
 RUN echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list
 
 # Atualizar a lista de pacotes e instalar o Google Chrome
-RUN apt-get update -y && apt-get install -y google-chrome-stable && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install -y --no-install-recommends google-chrome-stable && rm -rf /var/lib/apt/lists/*
 
 # Configurar variáveis de ambiente do Chromedriver
 ENV CHROMEDRIVER_VERSION "126.0.6478.126"
