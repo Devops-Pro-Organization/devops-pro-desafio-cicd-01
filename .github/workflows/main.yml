@@ -57,7 +57,7 @@ jobs:
             diogofiaminghi/projeto-devops-pro-filmes:v${{ github.run_number }}
       
       - name: Executar o Trivy
-        uses: aquasecurity/trivy-action@v0.29.0
+        uses: aquasecurity/trivy-action@0.29.0
         with:
           scan-type: "image"
           image-ref: diogofiaminghi/projeto-devops-pro-filmes:v${{ github.run_number }}
