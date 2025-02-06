@@ -18,11 +18,11 @@ jobs:
 
             - name: Deploy no Kubernetes
               uses: Azure/k8s-deploy@v5
-                with:
-                    manifests: |
-                        k8s/deployment.yaml
-```                 images: |
-                        diogofiaminghi/projeto-devops-pro-filmes:v${{ github.run_number }}
-                        
+              with:
+                manifests: |
+                    k8s/deployment.yaml
+                images: |
+                    diogofiaminghi/projeto-devops-pro-filmes:v${{ github.run_number }}
+
 
     
