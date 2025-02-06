@@ -81,3 +81,14 @@ jobs:
     needs: [release]
     uses: Devops-Pro-Organization/devops-pro-desafio-cicd-01/.github/workflows/deploy.yml@main
     secrets: inherit
+    with:
+      environment-name: homologacao
+      environment-url: http://homologacao.diogofiaminghi.com.br/
+
+  deploy-producao:
+      needs: [release]
+      uses: Devops-Pro-Organization/devops-pro-desafio-cicd-01/.github/workflows/deploy.yml@main
+      secrets: inherit
+      with:
+        environment-name: producao
+        environment-url: http://producao.diogofiaminghi.com.br/

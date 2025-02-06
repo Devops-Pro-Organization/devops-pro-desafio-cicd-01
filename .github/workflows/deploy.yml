@@ -1,11 +1,21 @@
 name: Deploy no Kubernetes
 on:
     workflow_call:
+        inputs:
+            environment-name:
+                required: true
+                type: string
+            environment-url:
+                required: true
+                type: string
 
 jobs:
     deploy:
         name: "Deploy"
         runs-on: ubuntu-latest
+        environment: 
+            name: ${{ inputs.environment-name }}
+            url: ${{ inputs.environment-url }}
         steps:
             - name: Checkout do código
               uses: actions/checkout@v4
@@ -16,9 +26,13 @@ jobs:
                   kubeconfig: ${{ secrets.KUBE_CONFIG }}
                   version: '1.21.0'
 
+            - name: Update Deployment
+              run: "sed -i 's/host: homologacao.diogofiaminghi.com.br/host: ${{ vars.BASE_URL }}/g' k8s/deployment.yaml"
+
             - name: Deploy no Kubernetes
               uses: Azure/k8s-deploy@v5
               with:
+                namespace: ${{ secrets.NAMESPACE }}
                 manifests: |
                     k8s/deployment.yaml
                 images: |
