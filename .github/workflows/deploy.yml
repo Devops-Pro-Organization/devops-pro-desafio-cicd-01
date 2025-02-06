@@ -1,0 +1,28 @@
+name: Deploy no Kubernetes
+on:
+    workflow_call:
+
+jobs:
+    deploy:
+        name: "Deploy"
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout do código
+              uses: actions/checkout@v4
+
+            - name: Setup Kubectl
+              uses: azure/k8s-set-context@v1
+              with:
+                  kubeconfig: ${{ secrets.KUBE_CONFIG }}
+                  version: '1.21.0'
+
+            - name: Deploy no Kubernetes
+              uses: Azure/k8s-deploy@v5
+                with:
+                    manifests: |
+                        k8s/deployment.yaml
+```                 images: |
+                        diogofiaminghi/projeto-devops-pro-filmes:v${{ github.run_number }}
+                        
+
+    

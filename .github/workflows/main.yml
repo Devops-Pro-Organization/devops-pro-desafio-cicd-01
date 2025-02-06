@@ -77,3 +77,7 @@ jobs:
           category: trivy
           sarif_file: trivy-docker-result.sarif
           
+  deploy-homolog:
+    needs: [release]
+    uses: Devops-Pro-Organization/devops-pro-desafio-cicd-01/.github/workflows/deploy.yml@main
+    secrets: inherit
